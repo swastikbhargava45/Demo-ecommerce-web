@@ -11,34 +11,65 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
+    <div id="global-loader" class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+
     <header class="site-header">
         <div class="header-inner container">
             <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
                 <i class="ph ph-list"></i>
             </button>
+            
             <a href="#home" class="logo" id="site-logo">Store</a>
+            
             <nav class="main-nav" id="main-nav">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#shop" class="nav-link">Shop</a>
-                <a href="#contact" class="nav-link">Contact</a>
+                <div class="nav-links">
+                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#shop" class="nav-link">Shop</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </div>
             </nav>
-            <a href="#cart" class="cart-icon" aria-label="Cart">
-                <i class="ph ph-shopping-bag"></i>
-                <span class="cart-count" id="cart-count">0</span>
-            </a>
+
+            <div class="header-actions">
+                <a href="#cart" class="cart-icon" aria-label="Cart">
+                    <i class="ph ph-shopping-bag"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <main id="app-root"></main>
+    <main id="app-root" class="fade-enter"></main>
 
     <footer class="site-footer">
-        <div class="container text-center">
-            <div class="footer-links">
-                <a href="#home">Home</a>
-                <a href="#shop">Shop</a>
-                <a href="#contact">Contact</a>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3 id="footer-logo" class="logo">Store</h3>
+                    <p class="footer-desc">Curated essentials for the modern lifestyle. Quality over quantity, always.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Navigation</h4>
+                    <a href="#home">Home</a>
+                    <a href="#shop">Shop</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Support</h4>
+                    <a href="#contact">FAQ</a>
+                    <a href="#contact">Shipping & Returns</a>
+                    <a href="#contact">Terms of Service</a>
+                </div>
             </div>
-            <p id="footer-text" class="footer-copyright">&copy; 2026 Store. All rights reserved.</p>
+            <div class="footer-bottom">
+                <p id="footer-text" class="footer-copyright">&copy; 2026 Store. All rights reserved.</p>
+                <div class="payment-icons">
+                    <i class="ph ph-credit-card"></i>
+                    <i class="ph ph-wallet"></i>
+                    <i class="ph ph-bank"></i>
+                </div>
+            </div>
         </div>
     </footer>
 
