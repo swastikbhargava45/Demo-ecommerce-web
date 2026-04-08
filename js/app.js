@@ -1,3 +1,10 @@
+// SUPABASE CONFIGURATION - Replace these with your actual keys
+const SUPABASE_URL = "YOUR_URL";
+const SUPABASE_KEY = "YOUR_KEY";
+
+// Initialize Supabase Client
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const App = {
     async init() {
         try {
@@ -116,13 +123,13 @@ const App = {
             requestAnimationFrame(() => {
                 root.classList.add('fade-enter-active');
             });
-        }, 200); // Matches CSS transition duration
+        }, 200);
     },
 
     // Global Handlers
     handleAddToCart(productId, event) {
         if(event) {
-            event.preventDefault(); // Stop link navigation if triggered from quick add
+            event.preventDefault(); 
             event.stopPropagation();
         }
         
@@ -159,6 +166,57 @@ const App = {
         let val = parseInt(input.value) + delta;
         if (val < 1) val = 1;
         input.value = val;
+    },
+
+    // --- SUPABASE CHECKOUT LOGIC ---
+    async submitOrder(event) {
+        event.preventDefault(); // Stop page from refreshing
+
+        // 1. Prevent empty orders
+        if (Cart.items.length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+
+        // 2. Change Button state to Loading
+        const btn = document.getElementById('submit-order-btn');
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '<i class="ph ph-spinner ph-spin" style="margin-right: 8px;"></i> Processing...';
+        btn.disabled = true;
+
+        // 3. Gather Data
+        const orderData = {
+            customer_name: document.getElementById('checkout-name').value,
+            phone: document.getElementById('checkout-phone').value,
+            address: document.getElementById('checkout-address').value,
+            products: Cart.items,
+            total: Cart.getTotal()
+        };
+
+        try {
+            // 4. Send to Supabase
+            const { data, error } = await supabase
+                .from('orders')
+                .insert([orderData]);
+
+            // 5. Handle Backend Error
+            if (error) throw error;
+
+            // 6. Handle Success
+            alert("Order placed successfully! We will contact you soon.");
+            Cart.items = []; // Empty the cart
+            Cart.save();     // Save the empty cart to storage
+            window.location.hash = '#home'; // Redirect to home
+
+        } catch (error) {
+            // 7. Handle Frontend/Network Error
+            console.error("Supabase Error:", error);
+            alert("There was an issue placing your order. Please check your connection and try again.");
+            
+            // Re-enable button
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+        }
     }
 };
 
