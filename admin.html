@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Store Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <div id="global-loader" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="login-view" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="ph ph-lock-key" style="font-size: 2.5rem; color: var(--color-primary);"></i>
+                <h2>Admin Login</h2>
+                <p>Enter your password to continue</p>
+            </div>
+            <form id="login-form" onsubmit="AdminApp.handleLogin(event)">
+                <div class="form-group">
+                    <input type="password" id="admin-password" class="form-control" placeholder="Password (default: admin123)" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-view" class="app-layout" style="display: none;">
+        
+        <header class="mobile-header">
+            <h2>Store Admin</h2>
+            <button onclick="AdminApp.logout()" class="btn-icon"><i class="ph ph-sign-out"></i></button>
+        </header>
+
+        <nav class="app-nav">
+            <div class="nav-brand">Store Admin</div>
+            <div class="nav-links">
+                <button class="nav-item active" data-target="dashboard" onclick="AdminApp.switchTab('dashboard')">
+                    <i class="ph ph-squares-four"></i> <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-target="orders" onclick="AdminApp.switchTab('orders')">
+                    <i class="ph ph-receipt"></i> <span>Orders</span>
+                </button>
+                <button class="nav-item" data-target="products" onclick="AdminApp.switchTab('products')">
+                    <i class="ph ph-package"></i> <span>Products</span>
+                </button>
+                <button class="nav-item" data-target="settings" onclick="AdminApp.switchTab('settings')">
+                    <i class="ph ph-gear"></i> <span>Settings</span>
+                </button>
+            </div>
+            <div class="nav-footer">
+                <button onclick="AdminApp.logout()" class="nav-item text-danger">
+                    <i class="ph ph-sign-out"></i> <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <main class="app-content">
+            
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h1>Dashboard</h1>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Total Revenue</div>
+                        <div class="stat-value" id="dash-revenue">₹0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Orders</div>
+                        <div class="stat-value" id="dash-orders-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Pending Orders</div>
+                        <div class="stat-value" id="dash-pending-count" style="color: #d97706;">0</div>
+                    </div>
+                </div>
+
+                <div class="card mt-24">
+                    <div class="card-header">
+                        <h3>Recent Orders</h3>
+                        <button class="btn-text" onclick="AdminApp.switchTab('orders')">View All</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-recent-orders">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="orders-section" class="content-section">
+                <div class="section-header">
+                    <h1>Orders</h1>
+                    <button class="btn btn-secondary" onclick="AdminApp.fetchOrders()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="products-section" class="content-section">
+                <div class="section-header">
+                    <h1>Products</h1>
+                    <button class="btn btn-primary" onclick="AdminApp.openProductModal()"><i class="ph ph-plus"></i> Add Product</button>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h1>Store Settings</h1>
+                </div>
+                
+                <div class="card" style="max-width: 600px;">
+                    <form id="settings-form" onsubmit="AdminApp.saveSettings(event)">
+                        <div class="form-group">
+                            <label>GST Percentage (%)</label>
+                            <input type="number" id="set-gst" class="form-control" step="0.1" value="18" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Shipping Charge (₹)</label>
+                            <input type="number" id="set-shipping" class="form-control" value="0" required>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="set-cod" style="width: 20px; height: 20px;">
+                            <label style="margin: 0;">Enable Cash on Delivery (COD)</label>
+                        </div>
+                        <div class="form-actions mt-24">
+                            <button type="submit" id="btn-save-settings" class="btn btn-primary">Save Settings</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-order-title">Order Details</h3>
+                <button class="btn-icon" onclick="AdminApp.closeModal('order-modal')"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body" id="order-modal-body">
+                </div>
+        </div>
+    </div>
+
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-modal-title">Add Product</h3>
+                <button class="btn-icon" onclick="AdminApp.closeModal('product-modal')"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form" onsubmit="AdminApp.saveProduct(event)">
+                    <input type="hidden" id="prod-id">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="prod-name" class="form-control" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="prod-price" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Discount Price (₹)</label>
+                            <input type="number" id="prod-discount" class="form-control">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" id="prod-category" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Qty</label>
+                            <input type="number" id="prod-stock" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="prod-image" class="form-control" placeholder="https://..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="prod-desc" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions mt-24">
+                        <button type="button" class="btn btn-secondary" onclick="AdminApp.closeModal('product-modal')">Cancel</button>
+                        <button type="submit" id="btn-save-product" class="btn btn-primary">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
