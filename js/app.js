@@ -1,12 +1,11 @@
-// Main App Orchestration
 const App = {
     async init() {
-        // Fetch all JSON data
         try {
+            // Using relative paths to ensure Vercel/Netlify compatibility
             const [configRes, contentRes, productsRes] = await Promise.all([
-                fetch('data/config.json'),
-                fetch('data/content.json'),
-                fetch('data/products.json')
+                fetch('./data/config.json'),
+                fetch('./data/content.json'),
+                fetch('./data/products.json')
             ]);
 
             window.StoreData = {
@@ -18,43 +17,53 @@ const App = {
             this.setupGlobalUI();
             Cart.updateBadge();
             
-            // Listen to route changes
             window.addEventListener('hashchange', () => this.router());
-            // Initial route
             this.router();
 
         } catch (error) {
-            console.error("Error loading data. Ensure you are running a local server.", error);
-            document.getElementById('app-root').innerHTML = `<p style="padding:20px; text-align:center; color:red;">Failed to load store data. If viewing via file://, please use a local web server.</p>`;
+            console.error("Error loading data:", error);
+            document.getElementById('app-root').innerHTML = `
+                <div class="container text-center" style="padding: 100px 20px;">
+                    <h2 style="color: #dc2626; margin-bottom: 10px;">Unable to load store data</h2>
+                    <p>Please ensure you are running this project via a local web server (not file://) or check deployment settings.</p>
+                </div>
+            `;
         }
     },
 
     setupGlobalUI() {
-        // Set dynamic store name and footer
         const storeName = window.StoreData.config.storeName;
         document.title = storeName;
         document.getElementById('site-logo').textContent = storeName;
         document.getElementById('footer-text').innerHTML = `&copy; ${new Date().getFullYear()} ${storeName}. All rights reserved.`;
 
-        // Mobile menu toggle logic
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            const nav = document.getElementById('main-nav');
-            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-            nav.style.flexDirection = 'column';
-            nav.style.position = 'absolute';
-            nav.style.top = '60px';
-            nav.style.left = '0';
-            nav.style.width = '100%';
-            nav.style.background = '#fff';
-            nav.style.padding = '20px';
-            nav.style.borderBottom = '1px solid var(--color-gray)';
+        // Mobile Menu Logic
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const nav = document.getElementById('main-nav');
+        
+        menuBtn.addEventListener('click', () => {
+            const isExpanded = nav.style.display === 'flex';
+            if (isExpanded) {
+                nav.style.display = 'none';
+            } else {
+                nav.style.display = 'flex';
+                nav.style.flexDirection = 'column';
+                nav.style.position = 'absolute';
+                nav.style.top = '70px';
+                nav.style.left = '0';
+                nav.style.width = '100%';
+                nav.style.background = '#fff';
+                nav.style.padding = '20px';
+                nav.style.borderBottom = '1px solid var(--color-border)';
+                nav.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.05)';
+            }
         });
 
-        // Hide mobile menu on link click
+        // Close menu on link click (mobile)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth < 768) {
-                    document.getElementById('main-nav').style.display = 'none';
+                    nav.style.display = 'none';
                 }
             });
         });
@@ -62,7 +71,7 @@ const App = {
 
     router() {
         const hash = window.location.hash.slice(1) || 'home';
-        window.scrollTo(0, 0); // Reset scroll on navigation
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         if (hash === 'home') UI.renderHome();
         else if (hash === 'shop') UI.renderShop();
@@ -70,26 +79,43 @@ const App = {
         else if (hash === 'cart') UI.renderCart();
         else if (hash === 'checkout') UI.renderCheckout();
         else if (hash === 'contact') UI.renderContact();
-        else UI.renderHome(); // Fallback
+        else UI.renderHome();
     },
 
-    // Global Handlers triggered from HTML onclicks
+    // Handlers
     handleAddToCart(productId) {
         const product = window.StoreData.products.find(p => p.id === productId);
-        Cart.add(product);
+        const qtyInput = document.getElementById('pd-qty');
+        const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
         
-        // Brief UI feedback
-        const btn = document.querySelector('.btn-add-cart');
-        const originalText = btn.textContent;
-        btn.textContent = 'Added!';
-        setTimeout(() => btn.textContent = originalText, 1000);
+        Cart.add(product, quantity);
+        
+        // Button feedback
+        const btn = document.getElementById('add-to-cart-btn');
+        if(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="ph ph-check"></i> Added to Cart`;
+            btn.style.backgroundColor = 'var(--color-success)';
+            btn.style.borderColor = 'var(--color-success)';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+            }, 1500);
+        }
     },
 
     handleUpdateQty(productId, delta) {
         Cart.updateQty(productId, delta);
-        UI.renderCart(); // Re-render cart UI
+        UI.renderCart();
+    },
+
+    handlePdQtyChange(delta) {
+        const input = document.getElementById('pd-qty');
+        let val = parseInt(input.value) + delta;
+        if (val < 1) val = 1;
+        input.value = val;
     }
 };
 
-// Start application
 document.addEventListener('DOMContentLoaded', () => App.init());
