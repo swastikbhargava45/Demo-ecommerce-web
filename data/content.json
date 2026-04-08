@@ -1,0 +1,12 @@
+{
+  "home": {
+    "heroTitle": "Essential Goods for Modern Living",
+    "heroSubtitle": "Thoughtfully designed, carefully crafted.",
+    "heroButtonText": "Shop Collection",
+    "heroImage": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=1000"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "description": "Have a question or need help with an order? Drop us a line."
+  }
+}
