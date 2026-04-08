@@ -1,12 +1,12 @@
 {
   "home": {
-    "heroTitle": "Essential Goods for Modern Living",
-    "heroSubtitle": "Thoughtfully designed, carefully crafted.",
+    "heroTitle": "Elevate Your Everyday",
+    "heroSubtitle": "Premium essentials designed for modern living.",
     "heroButtonText": "Shop Collection",
-    "heroImage": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=1000"
+    "heroImage": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=1600"
   },
   "contact": {
-    "title": "Get in Touch",
-    "description": "Have a question or need help with an order? Drop us a line."
+    "title": "We're here to help",
+    "description": "Have a question about an order or a product? Send us an email and our team will get back to you within 24 hours."
   }
 }
