@@ -3,28 +3,21 @@
     "id": "1",
     "name": "Minimalist Ceramic Mug",
     "price": 1299.00,
-    "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=800",
-    "description": "Hand-crafted ceramic mug with a matte finish. Perfect for your morning coffee or evening tea. Microwave and dishwasher safe."
+    "images": [
+      "./assets/products/ceramic-mug-1.jpg",
+      "./assets/products/ceramic-mug-2.jpg"
+    ],
+    "description": "Hand-crafted ceramic mug with a matte finish. Perfect for your morning coffee or evening tea."
   },
   {
     "id": "2",
     "name": "Organic Linen Throw",
     "price": 4599.00,
-    "image": "https://images.unsplash.com/photo-1583847268964-b28e50bc004c?auto=format&fit=crop&q=80&w=800",
-    "description": "Woven from 100% organic French flax. This stonewashed linen throw gets softer with every wash. Breathable, cozy, and effortlessly stylish."
-  },
-  {
-    "id": "3",
-    "name": "Concrete Desk Planter",
-    "price": 899.00,
-    "image": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80&w=800",
-    "description": "Geometric concrete planter ideal for succulents. Adds an industrial yet refined touch to your home or office workspace."
-  },
-  {
-    "id": "4",
-    "name": "Leather Notebook",
-    "price": 1899.00,
-    "image": "https://images.unsplash.com/photo-1532153955177-f59af40d6472?auto=format&fit=crop&q=80&w=800",
-    "description": "Full-grain leather bound notebook with 120gsm acid-free paper. Designed to age beautifully alongside your thoughts and ideas."
+    "images": [
+      "./assets/products/linen-throw-1.jpg",
+      "./assets/products/linen-throw-2.jpg",
+      "./assets/products/linen-throw-3.jpg"
+    ],
+    "description": "Woven from 100% organic French flax. This stonewashed linen throw gets softer with every wash."
   }
 ]
