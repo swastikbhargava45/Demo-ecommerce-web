@@ -30,6 +30,26 @@ const UI = {
                 </div>
             </div>
             
+            <div class="container">
+                <div class="trust-section">
+                    <div class="trust-item">
+                        <i class="ph ph-truck"></i>
+                        <h4>Complimentary Shipping</h4>
+                        <p>On all domestic orders over ${window.StoreData.config.currencySymbol}5000</p>
+                    </div>
+                    <div class="trust-item">
+                        <i class="ph ph-arrow-u-up-left"></i>
+                        <h4>Easy Returns</h4>
+                        <p>30-day hassle-free return policy</p>
+                    </div>
+                    <div class="trust-item">
+                        <i class="ph ph-lock-key"></i>
+                        <h4>Secure Checkout</h4>
+                        <p>Bank-grade SSL encryption</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="container" style="padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl);">
                 <h2 class="section-title">New Arrivals</h2>
                 <div class="product-grid">
@@ -59,7 +79,6 @@ const UI = {
     generateProductCards(products) {
         return products.map(p => {
             const mainImg = this.getMainImage(p);
-            // Optional: Premium hover effect to show second image if available
             const hoverImg = (p.images && p.images.length > 1) ? p.images[1] : mainImg;
             
             return `
@@ -83,7 +102,6 @@ const UI = {
         const product = window.StoreData.products.find(p => p.id === id);
         if (!product) return this.renderShop();
 
-        // Generate Gallery HTML
         const safeImages = (product.images && product.images.length > 0) ? product.images : [this.fallbackImage];
         const mainImageHtml = `<img id="main-product-image" src="${safeImages[0]}" alt="${product.name}" class="pd-image" onerror="this.src='${this.fallbackImage}'" style="border-radius: var(--radius-md); transition: opacity 0.3s ease;">`;
         
@@ -197,12 +215,32 @@ const UI = {
     },
 
     renderCheckout() {
+        // Form now calls App.submitOrder(event) on submission
         this.root.innerHTML = `
             <div class="container cart-container" style="max-width: 600px;">
                 <h1 style="margin-bottom: var(--spacing-sm);">Checkout</h1>
-                <form onsubmit="event.preventDefault(); alert('Payment processed successfully!'); Cart.items=[]; Cart.save(); window.location.hash='#home';">
-                    <div class="form-group"><input type="email" class="form-control" placeholder="Email address" required></div>
-                    <button type="submit" class="btn"><i class="ph ph-lock-key" style="margin-right: 8px;"></i> Pay ${this.formatPrice(Cart.getTotal())}</button>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg);">Please enter your details below.</p>
+                <form onsubmit="App.submitOrder(event)">
+                    <div class="form-group">
+                        <input type="text" id="checkout-name" class="form-control" placeholder="Full name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="checkout-phone" class="form-control" placeholder="Phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="checkout-address" class="form-control" rows="3" placeholder="Delivery Address" required></textarea>
+                    </div>
+                    
+                    <div class="cart-summary" style="margin: var(--spacing-lg) 0; box-shadow: none; background: var(--color-bg);">
+                        <div class="summary-row total" style="border-top: none; padding-top: 0; margin-top: 0;">
+                            <span>Total due</span>
+                            <span>${this.formatPrice(Cart.getTotal())}</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="submit-order-btn" class="btn">
+                        <i class="ph ph-lock-key" style="margin-right: 8px;"></i> Pay ${this.formatPrice(Cart.getTotal())}
+                    </button>
                 </form>
             </div>
         `;
