@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Store</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Premium Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="header-inner container">
-            <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
                 <i class="ph ph-list"></i>
             </button>
             <a href="#home" class="logo" id="site-logo">Store</a>
@@ -19,7 +22,7 @@
                 <a href="#shop" class="nav-link">Shop</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </nav>
-            <a href="#cart" class="cart-icon">
+            <a href="#cart" class="cart-icon" aria-label="Cart">
                 <i class="ph ph-shopping-bag"></i>
                 <span class="cart-count" id="cart-count">0</span>
             </a>
@@ -30,13 +33,17 @@
 
     <footer class="site-footer">
         <div class="container text-center">
-            <p id="footer-text">&copy; 2026 Store. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#home">Home</a>
+                <a href="#shop">Shop</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <p id="footer-text" class="footer-copyright">&copy; 2026 Store. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="js/cart.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
+    <script src="./js/cart.js"></script>
+    <script src="./js/ui.js"></script>
+    <script src="./js/app.js"></script>
 </body>
 </html>
-
