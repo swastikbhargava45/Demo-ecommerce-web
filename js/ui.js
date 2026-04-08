@@ -1,12 +1,20 @@
 const UI = {
     root: document.getElementById('app-root'),
     
-    // Minimalist fallback image
+    // Fallback image if a GitHub path is broken or missing
     fallbackImage: 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&q=80&w=800',
     
     formatPrice(price) {
         const sym = window.StoreData.config.currencySymbol;
         return `${sym}${price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    },
+
+    // Safely get the main image or fallback
+    getMainImage(product) {
+        if (product.images && product.images.length > 0) {
+            return product.images[0];
+        }
+        return this.fallbackImage;
     },
 
     renderHome() {
@@ -22,26 +30,6 @@ const UI = {
                 </div>
             </div>
             
-            <div class="container">
-                <div class="trust-section">
-                    <div class="trust-item">
-                        <i class="ph ph-truck"></i>
-                        <h4>Complimentary Shipping</h4>
-                        <p>On all domestic orders over ${window.StoreData.config.currencySymbol}5000</p>
-                    </div>
-                    <div class="trust-item">
-                        <i class="ph ph-arrow-u-up-left"></i>
-                        <h4>Easy Returns</h4>
-                        <p>30-day hassle-free return policy</p>
-                    </div>
-                    <div class="trust-item">
-                        <i class="ph ph-lock-key"></i>
-                        <h4>Secure Checkout</h4>
-                        <p>Bank-grade SSL encryption</p>
-                    </div>
-                </div>
-            </div>
-
             <div class="container" style="padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl);">
                 <h2 class="section-title">New Arrivals</h2>
                 <div class="product-grid">
@@ -69,10 +57,15 @@ const UI = {
     },
 
     generateProductCards(products) {
-        return products.map(p => `
-            <a href="#product/${p.id}" class="product-card">
+        return products.map(p => {
+            const mainImg = this.getMainImage(p);
+            // Optional: Premium hover effect to show second image if available
+            const hoverImg = (p.images && p.images.length > 1) ? p.images[1] : mainImg;
+            
+            return `
+            <a href="#product/${p.id}" class="product-card" onmouseenter="this.querySelector('.product-card-img').src='${hoverImg}'" onmouseleave="this.querySelector('.product-card-img').src='${mainImg}'">
                 <div class="product-card-img-wrapper">
-                    <img src="${p.image}" alt="${p.name}" class="product-card-img" loading="lazy" onerror="this.src='${this.fallbackImage}'">
+                    <img src="${mainImg}" alt="${p.name}" class="product-card-img" loading="lazy" onerror="this.src='${this.fallbackImage}'">
                     <div class="quick-add-overlay">
                         <button class="btn-quick-add" onclick="App.handleAddToCart('${p.id}', event)">Quick Add</button>
                     </div>
@@ -82,18 +75,42 @@ const UI = {
                     <div class="product-price">${this.formatPrice(p.price)}</div>
                 </div>
             </a>
-        `).join('');
+            `;
+        }).join('');
     },
 
     renderProduct(id) {
         const product = window.StoreData.products.find(p => p.id === id);
         if (!product) return this.renderShop();
 
+        // Generate Gallery HTML
+        const safeImages = (product.images && product.images.length > 0) ? product.images : [this.fallbackImage];
+        const mainImageHtml = `<img id="main-product-image" src="${safeImages[0]}" alt="${product.name}" class="pd-image" onerror="this.src='${this.fallbackImage}'" style="border-radius: var(--radius-md); transition: opacity 0.3s ease;">`;
+        
+        let thumbnailsHtml = '';
+        if (safeImages.length > 1) {
+            thumbnailsHtml = `
+                <div style="display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px;">
+                    ${safeImages.map((img) => `
+                        <img src="${img}" 
+                             onclick="document.getElementById('main-product-image').src='${img}'"
+                             onerror="this.src='${this.fallbackImage}'"
+                             style="width: 80px; height: 100px; object-fit: cover; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--color-border);" 
+                             alt="Thumbnail">
+                    `).join('')}
+                </div>
+            `;
+        }
+
         this.root.innerHTML = `
             <div class="container product-detail">
-                <div class="pd-image-container">
-                    <img src="${product.image}" alt="${product.name}" class="pd-image" onerror="this.src='${this.fallbackImage}'">
+                <div>
+                    <div class="pd-image-container" style="border: none; background: transparent; margin-bottom: 0;">
+                        ${mainImageHtml}
+                    </div>
+                    ${thumbnailsHtml}
                 </div>
+                
                 <div class="pd-info">
                     <h1>${product.name}</h1>
                     <div class="pd-price">${this.formatPrice(product.price)}</div>
@@ -103,20 +120,15 @@ const UI = {
                     <div class="pd-action-area" style="margin-top: var(--spacing-md);">
                         <div style="font-size: 0.9rem; font-weight: 500; margin-bottom: 12px; color: var(--color-text-muted);">Quantity</div>
                         <div class="qty-selector">
-                            <button onclick="App.handlePdQtyChange(-1)" aria-label="Decrease quantity"><i class="ph ph-minus"></i></button>
+                            <button onclick="App.handlePdQtyChange(-1)"><i class="ph ph-minus"></i></button>
                             <input type="number" id="pd-qty" value="1" min="1" readonly>
-                            <button onclick="App.handlePdQtyChange(1)" aria-label="Increase quantity"><i class="ph ph-plus"></i></button>
+                            <button onclick="App.handlePdQtyChange(1)"><i class="ph ph-plus"></i></button>
                         </div>
                         
                         <div class="mobile-sticky-cta">
                             <button id="add-to-cart-btn" class="btn" onclick="App.handleAddToCart('${product.id}', event)">
                                 Add to Cart — ${this.formatPrice(product.price)}
                             </button>
-                        </div>
-                        
-                        <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--color-border); font-size: 0.9rem; color: var(--color-text-muted);">
-                            <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 8px;"><i class="ph ph-check-circle"></i> In stock and ready to ship</div>
-                            <div style="display:flex; align-items:center; gap: 8px;"><i class="ph ph-arrow-counter-clockwise"></i> Free returns within 30 days</div>
                         </div>
                     </div>
                 </div>
@@ -132,15 +144,16 @@ const UI = {
                         <i class="ph ph-shopping-bag-open"></i>
                     </div>
                     <h2>Your bag is empty</h2>
-                    <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg);">Let's find something special for you.</p>
-                    <a href="#shop" class="btn" style="width: auto;">Continue Shopping</a>
+                    <a href="#shop" class="btn" style="width: auto; margin-top: var(--spacing-lg);">Continue Shopping</a>
                 </div>`;
             return;
         }
 
-        const itemsHtml = Cart.items.map(item => `
+        const itemsHtml = Cart.items.map(item => {
+            const mainImg = this.getMainImage(item);
+            return `
             <div class="cart-item">
-                <img src="${item.image}" alt="${item.name}" class="cart-item-img" onerror="this.src='${this.fallbackImage}'">
+                <img src="${mainImg}" alt="${item.name}" class="cart-item-img" onerror="this.src='${this.fallbackImage}'">
                 <div class="cart-item-details">
                     <div>
                         <div class="cart-item-title">${item.name}</div>
@@ -156,7 +169,8 @@ const UI = {
                     </div>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         this.root.innerHTML = `
             <div class="container cart-container">
@@ -169,10 +183,6 @@ const UI = {
                             <div class="summary-row">
                                 <span>Subtotal</span>
                                 <span>${this.formatPrice(Cart.getTotal())}</span>
-                            </div>
-                            <div class="summary-row">
-                                <span>Shipping</span>
-                                <span>Calculated at checkout</span>
                             </div>
                             <div class="summary-row total">
                                 <span>Total</span>
@@ -190,31 +200,9 @@ const UI = {
         this.root.innerHTML = `
             <div class="container cart-container" style="max-width: 600px;">
                 <h1 style="margin-bottom: var(--spacing-sm);">Checkout</h1>
-                <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg);">Please enter your details below.</p>
                 <form onsubmit="event.preventDefault(); alert('Payment processed successfully!'); Cart.items=[]; Cart.save(); window.location.hash='#home';">
-                    <div class="form-group">
-                        <input type="email" class="form-control" placeholder="Email address" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="First name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Last name" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Address" required>
-                    </div>
-                    
-                    <div class="cart-summary" style="margin: var(--spacing-lg) 0; box-shadow: none; background: var(--color-bg);">
-                        <div class="summary-row total" style="border-top: none; padding-top: 0; margin-top: 0;">
-                            <span>Total due</span>
-                            <span>${this.formatPrice(Cart.getTotal())}</span>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn"><i class="ph ph-lock-key" style="margin-right: 8px;"></i> Pay Now</button>
+                    <div class="form-group"><input type="email" class="form-control" placeholder="Email address" required></div>
+                    <button type="submit" class="btn"><i class="ph ph-lock-key" style="margin-right: 8px;"></i> Pay ${this.formatPrice(Cart.getTotal())}</button>
                 </form>
             </div>
         `;
@@ -223,14 +211,10 @@ const UI = {
     renderContact() {
         const { contact } = window.StoreData.content;
         this.root.innerHTML = `
-            <div class="container cart-container text-center" style="max-width: 600px; padding-top: 100px; padding-bottom: 100px;">
+            <div class="container cart-container text-center" style="max-width: 600px; padding-top: 100px;">
                 <h1 style="margin-bottom: var(--spacing-sm);">${contact.title}</h1>
-                <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg); font-size: 1.1rem;">
-                    ${contact.description}
-                </p>
-                <a href="mailto:${window.StoreData.config.supportEmail}" class="btn" style="width: auto;">
-                    Email Support
-                </a>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg);">${contact.description}</p>
+                <a href="mailto:${window.StoreData.config.supportEmail}" class="btn" style="width: auto;">Email Support</a>
             </div>
         `;
     }
