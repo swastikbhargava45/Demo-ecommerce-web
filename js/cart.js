@@ -37,9 +37,17 @@ const Cart = {
     updateBadge() {
         const count = this.items.reduce((sum, item) => sum + item.qty, 0);
         const badge = document.getElementById('cart-count');
+        const cartIcon = document.querySelector('.cart-icon');
+        
         if (badge) {
             badge.textContent = count;
             badge.style.display = count > 0 ? 'flex' : 'none';
+            
+            // Tiny bounce animation on update
+            if(count > 0 && cartIcon) {
+                cartIcon.style.transform = 'scale(1.15)';
+                setTimeout(() => cartIcon.style.transform = '', 200);
+            }
         }
     }
 };
