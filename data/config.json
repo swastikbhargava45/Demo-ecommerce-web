@@ -1,7 +1,6 @@
 {
-  "storeName": "Minimalist",
-  "currencySymbol": "$",
-  "currencyCode": "USD",
-  "supportEmail": "hello@minimalist.com"
+  "storeName": "Premium Store",
+  "currencySymbol": "₹",
+  "currencyCode": "INR",
+  "supportEmail": "support@premiumstore.in"
 }
-
