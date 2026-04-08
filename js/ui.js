@@ -244,14 +244,42 @@ const UI = {
                     <h1 style="margin-bottom: var(--spacing-sm);">Checkout</h1>
                     <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-lg);">Please enter your details below.</p>
                     <form id="checkoutForm" onsubmit="App.submitOrder(event)">
+                        
                         <div class="form-group">
-                            <input type="text" id="checkout-name" class="form-control" placeholder="Full name" required>
+                            <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; display: block;">Full Name</label>
+                            <input type="text" id="checkout-name" class="form-control" placeholder="John Doe" required>
                         </div>
+                        
                         <div class="form-group">
-                            <input type="tel" id="checkout-phone" class="form-control" placeholder="Phone number" required>
+                            <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; display: block;">Phone Number</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="tel" id="checkout-phone" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                                <button type="button" id="btn-send-otp" class="btn btn-outline" style="width: auto; padding: 0 16px; white-space: nowrap;" onclick="App.handleSendOTP()">Send OTP</button>
+                            </div>
                         </div>
+
+                        <div class="form-group" id="otp-section" style="display: none; gap: 8px; margin-top: -8px;">
+                            <input type="text" id="checkout-otp" class="form-control" placeholder="Enter OTP (e.g. 1234)">
+                            <button type="button" id="btn-verify-otp" class="btn" style="width: auto; padding: 0 16px; white-space: nowrap; background: var(--color-primary); color: #fff;" onclick="App.handleVerifyOTP()">Verify</button>
+                        </div>
+                        <div id="otp-success-msg" style="display: none; color: var(--color-success, #059669); font-size: 0.85rem; font-weight: 500; margin-top: -8px; margin-bottom: 16px;">
+                            <i class="ph ph-check-circle"></i> Number verified successfully.
+                        </div>
+
                         <div class="form-group">
-                            <textarea id="checkout-address" class="form-control" rows="3" placeholder="Delivery Address" required></textarea>
+                            <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; display: block;">Delivery Address</label>
+                            <textarea id="checkout-address" class="form-control" rows="3" placeholder="Street, House No, Landmark" required></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                            <div class="form-group">
+                                <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; display: block;">City</label>
+                                <input type="text" id="checkout-city" class="form-control" placeholder="City" required>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; display: block;">Pincode</label>
+                                <input type="text" id="checkout-pincode" class="form-control" placeholder="6-digit Pincode" pattern="[0-9]{6}" required>
+                            </div>
                         </div>
                         
                         <div class="cart-summary" style="margin: var(--spacing-lg) 0; box-shadow: none; background: transparent; padding: 0;">
@@ -261,9 +289,10 @@ const UI = {
                             </div>
                         </div>
                         
-                        <button type="submit" id="submit-order-btn" class="btn">
+                        <button type="submit" id="submit-order-btn" class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">
                             <i class="ph ph-lock-key" style="margin-right: 8px;"></i> Place Order ${this.formatPrice(Cart.getTotal())}
                         </button>
+                        <p id="submit-help-text" style="text-align: center; font-size: 0.85rem; color: var(--color-text-muted); margin-top: 12px;">Please verify your phone number to place the order.</p>
                     </form>
                 </div>
             `;
